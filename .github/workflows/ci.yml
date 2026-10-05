@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: typecheck, lint, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Nothing below needs a database or an API key: without DATABASE_URL the app
+      # uses the embedded PGlite build of Postgres and all three upstreams are
+      # keyless public endpoints.
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit and integration tests
+        run: npm run test
+
+      - name: Production build
+        run: npm run build
+
+  smoke:
+    name: browser journey
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: verify
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      # Rehearses the real production bundle on the embedded store. The database
+      # is not durable here, which is exactly why a deployment without a hosted
+      # DATABASE_URL refuses to boot.
+      - name: Browser smoke test
+        run: npm run smoke
+
+      - name: Upload failure trace
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

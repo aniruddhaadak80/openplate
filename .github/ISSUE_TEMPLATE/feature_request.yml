@@ -1,0 +1,34 @@
+---
+name: Feature request
+about: Propose a capability, with the user problem it solves
+title: ""
+labels: enhancement
+assignees: ""
+---
+
+**The problem**
+
+<!-- Who is stuck, doing what, and what it costs them today. -->
+
+**What you would use**
+
+<!-- The action, not the screen. -->
+
+**Why it belongs here**
+
+<!--
+OpenPlate is a rights clearance desk with one loop: search, pin, score, decide,
+seal, export. A request is a strong fit if it makes one of those steps better or
+shorter.
+
+Please do not ask for a control that needs an API key we do not have. The whole
+demo runs on keyless public endpoints and we would rather keep it that way.
+-->
+
+**How it would behave**
+
+**What it would cost**
+
+<!-- Data model, engine factor, API surface, whether it needs a migration. -->
+
+**Alternatives you considered**

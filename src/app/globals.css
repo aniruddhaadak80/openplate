@@ -1,26 +1,256 @@
 @import "tailwindcss";
 
+/*
+  OpenPlate visual identity.
+
+  The room is a print shop at night. The ground is a warm ink black, the type is
+  bone, and the one bright thing on the page is a sheet of proof paper with the
+  artwork on it. Everything else is furniture from that bench: crop marks at the
+  corners of a panel, a slug line running down the left in monospace, a colour bar
+  and a greyscale step wedge for reading values.
+
+  Why: this product exists to decide whether a picture may be printed. So the
+  interface is a press proof, not an analytics dashboard. The dark room makes the
+  proof sheet read as lit, which is exactly the relationship a publisher has with
+  an image they are about to reproduce.
+
+  Delta vs the previous builds in this account, which were a chalk drafting sheet,
+  a pair of debate podiums, a lifeguard noticeboard and a 96-well microtiter plate:
+  the ground is dark and warm rather than pale and cool, the layout rhythm is a
+  narrow slug gutter against a wide proof sheet rather than a card grid or
+  full-width bands, and the display face is a didone rather than a grotesque.
+*/
+
+@theme {
+  /* The room. */
+  --color-room: #14100e;
+  --color-room-deep: #0c0908;
+  --color-bench: #1c1714;
+  --color-bench-lit: #241d19;
+
+  /* Ink on the dark ground. */
+  --color-bone: #f2ece1;
+  --color-bone-dim: #b9afa1;
+  --color-bone-faint: #877c70;
+
+  /* The proof sheet. */
+  --color-paper: #f7f2e7;
+  --color-paper-dim: #e6dccb;
+  --color-paper-rule: #cdc0aa;
+
+  /* Ink on paper. */
+  --color-ink: #17120f;
+  --color-ink-soft: #4c443b;
+  --color-ink-faint: #857a6e;
+
+  /* Rules. */
+  --color-rule: #2d2620;
+  --color-rule-bright: #473d33;
+
+  /* Spot inks. Each verdict state owns exactly one, and nothing decorative uses
+     any of them. */
+  --color-clear: #86c34a;
+  --color-credited: #4b9fd8;
+  --color-review: #f0a12e;
+  --color-blocked: #e8452f;
+  --color-measured: #9b7ad6;
+  --color-live: #86c34a;
+
+  /* The step wedge: ten patches of one ink at rising density. */
+  --color-wedge-1: #241d19;
+  --color-wedge-2: #2e2620;
+  --color-wedge-3: #3a312a;
+  --color-wedge-4: #483d34;
+  --color-wedge-5: #574a3f;
+  --color-wedge-6: #67584b;
+  --color-wedge-7: #7a6858;
+  --color-wedge-8: #8f7a66;
+  --color-wedge-9: #a68e77;
+  --color-wedge-10: #bfa68c;
+
+  --font-display: var(--font-bodoni), "Bodoni Moda", ui-serif, Georgia, serif;
+  --font-body: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--color-room-deep);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-room);
+  color: var(--color-bone);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/*
+  The signature interaction and its supporting furniture.
+
+  A panel is a piece of paper pinned to a bench: square corners, one hairline
+  rule, and crop marks printed just outside the corners. The crop marks are the
+  layout signature of this product; they appear on every framed surface.
+*/
+.crop {
+  position: relative;
+}
+
+.crop::before,
+.crop::after {
+  content: "";
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-color: var(--color-rule-bright);
+  border-style: solid;
+  pointer-events: none;
+}
+
+.crop::before {
+  top: -1px;
+  left: -1px;
+  border-width: 1px 0 0 1px;
+}
+
+.crop::after {
+  right: -1px;
+  bottom: -1px;
+  border-width: 0 1px 1px 0;
+}
+
+.on-paper.crop::before,
+.on-paper.crop::after {
+  border-color: var(--color-paper-rule);
+}
+
+/* Slug line: the monospace metadata column a printer writes beside a plate. */
+.slug {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-bone-faint);
+}
+
+.slug-ink {
+  color: var(--color-ink-faint);
+}
+
+/* Tabular figures everywhere a number can change. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Focus is a crop-mark corner, not a browser default. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-review);
+  outline-offset: 2px;
+}
+
+/*
+  The step wedge. Ten patches of one ink at rising density, the way a printer
+  reads density off a strip rather than off a number.
+*/
+.wedge {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 2px;
+}
+
+.wedge-patch {
+  height: 2.25rem;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  transition: transform 120ms ease;
+}
+
+.wedge-patch:hover {
+  transform: translateY(-2px);
+}
+
+.wedge-patch[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  inset: -4px -3px;
+  border: 1px solid var(--color-review);
+}
+
+/* The registration target: the crosshair a printer aligns plate to sheet. */
+.register {
+  position: relative;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+}
+
+.register::before,
+.register::after {
+  content: "";
+  position: absolute;
+  background: var(--color-rule-bright);
+}
+
+.register::before {
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  transform: translateX(-50%);
+}
+
+.register::after {
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+/* The galley rail: a slug travelling along a track. */
+.rail {
+  position: relative;
+  height: 2px;
+  background: var(--color-rule);
+}
+
+.slug-marker {
+  position: absolute;
+  top: 50%;
+  height: 1.375rem;
+  width: 0.4375rem;
+  transform: translate(-50%, -50%);
+  background: var(--color-review);
+  border: 1px solid var(--color-room);
+}
+
+/* Hairline grid on the room, like light across a bench. */
+.bench-wash {
+  background-image:
+    linear-gradient(to right, rgba(242, 236, 225, 0.022) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(242, 236, 225, 0.022) 1px, transparent 1px);
+  background-size: 4rem 4rem;
+}
+
+/* Motion is opt-out, never opt-in. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .wedge-patch:hover {
+    transform: none;
+  }
 }

@@ -1,0 +1,40 @@
+---
+name: Bug report
+about: Something the product says or does is wrong
+title: ""
+labels: bug
+assignees: ""
+---
+
+**What happened**
+
+<!-- What you saw. If a verdict was wrong, say which record, which jurisdiction and which intended use. -->
+
+**What you expected**
+
+**Where**
+
+- [ ] Landing page (`/`)
+- [ ] Docket (`/plates`)
+- [ ] Plate (`/plates/<id>`)
+- [ ] Shared docket (`/d/<code>`)
+- [ ] Terms (`/terms`)
+- [ ] Agent console (`/agent`)
+- [ ] Export (`/export`)
+- [ ] An API route (which one)
+- [ ] Documentation
+
+**Viewport and browser**
+
+**The real data**
+
+<!--
+If this is about a museum record, include the work id (`met:11298` or `cle:135382`).
+If the page showed the sealed fallback rather than live data, say so: that is a
+different failure mode and worth knowing about.
+-->
+
+**Anything else**
+
+- Console or network errors, if you saw any
+- Whether the chain replay said `ok` or reported a broken link
