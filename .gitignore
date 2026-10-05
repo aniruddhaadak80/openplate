@@ -44,3 +44,8 @@ yarn-error.log*
 
 # editors
 *.tsbuildinfo
+
+# Third-party tooling installed by the Neon marketplace integration. Not part of
+# this product, and not something a contributor needs checked in.
+.agents/
+skills-lock.json
