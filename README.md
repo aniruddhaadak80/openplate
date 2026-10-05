@@ -4,17 +4,17 @@
 
 ### Know what you are allowed to put in print.
 
-[![Live app](https://img.shields.io/badge/live%20app-vercel.app-22d3ee)](https://openplate.vercel.app)
+[![Live app](https://img.shields.io/badge/live%20app-openplate--sigma.vercel.app-22d3ee)](https://openplate-sigma.vercel.app)
 [![MIT](https://img.shields.io/badge/license-ML-a78bfa)](LICENSE)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-000000)](https://nextjs.org)
 [![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-3178c6)](tsconfig.json)
 [![Neon Postgres](https://img.shields.io/badge/persistence-hosted%20Postgres-34d399)](src/lib/db)
 [![Live feeds](https://img.shields.io/badge/data-Met%20%C2%B7%20Cleveland%20%C2%B7%20Wikidata-fbbf24)](src/lib/sources)
-[![MCP](https://img.shields.io/badge/agent-6%20JSON--RPC%20tools-4b9fd8)](https://openplate.vercel.app/agent)
-[![Tests](https://img.shields.io/badge/tests-50%20passing-brightgreen)](tests)
+[![MCP](https://img.shields.io/badge/agent-6%20JSON--RPC%20tools-4b9fd8)](https://openplate-sigma.vercel.app/agent)
+[![Tests](https://img.shields.io/badge/tests-70%20passing-brightgreen)](tests)
 [![CI](https://img.shields.io/badge/CI-typecheck%20%C2%B7%20lint%20%C2%B7%20test%20%C2%B7%20build-34d399)](.github/workflows/ci.yml)
 
-[Live app](https://openplate.vercel.app) · [GitHub](https://github.com/aniruddhaadak80/openplate) · [Health](https://openplate.vercel.app/api/health) · [Agent](https://openplate.vercel.app/agent) · [Issues](https://github.com/aniruddhaadak80/openplate/issues)
+[Live app](https://openplate-sigma.vercel.app) · [GitHub](https://github.com/aniruddhaadak80/openplate) · [Health](https://openplate-sigma.vercel.app/api/health) · [Agent](https://openplate-sigma.vercel.app/agent) · [Issues](https://github.com/aniruddhaadak80/openplate/issues)
 
 </div>
 
@@ -88,11 +88,12 @@ institutions are keyless public endpoints.
 | `npm run dev` | Development server |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | ESLint |
-| `npm run test` | Vitest: engine, hash chain, full CRUD over a real database |
+| `npm run test` | Vitest: engine, hash chain, validation, full CRUD over a real database |
 | `npm run build` | Production bundle |
 | `npm run smoke` | Playwright: the primary journey through visible controls |
 | `npm run verify:local` | Boots the production bundle and runs the full live verifier against it |
 | `npm run verify:live` | Runs the same verifier against a deployment (`BASE_URL=...`) |
+| `npm run check:links` | Checks that every absolute URL in this file still resolves |
 
 ### Production variables
 
@@ -116,42 +117,42 @@ Errors always arrive as `{"error":{"code","message","fields"?}}`.
 
 ```bash
 # 1. Search both collections, live.
-curl -s 'https://openplate.vercel.app/api/works?q=jaguar&limit=4' | jq '.works[] | {id, title, institutionCleared}'
+curl -s 'https://openplate-sigma.vercel.app/api/works?q=jaguar&limit=4' | jq '.works[] | {id, title, institutionCleared}'
 
 # 2. Pin a real record to an intended use. Returns 201 with the plate and its seal.
-curl -s -X POST https://openplate.vercel.app/api/plates \
+curl -s -X POST https://openplate-sigma.vercel.app/api/plates \
   -H 'content-type: application/json' \
   -b cookies.txt -c cookies.txt \
   -d '{"workId":"met:11298","use":"editorial","jurisdiction":"us","circulation":10000,"note":"Issue 14"}' \
   | jq '{id: .plate.id, shareUrl, band: .assessment.band, score: .assessment.score, seal: .plate.seal}'
 
 # 3. Read it back through the UI-facing API.
-curl -s -b cookies.txt https://openplate.vercel.app/api/plates | jq '.plates[0] | {title, use, chain}'
+curl -s -b cookies.txt https://openplate-sigma.vercel.app/api/plates | jq '.plates[0] | {title, use, chain}'
 
 # 4. Change the inputs. The verdict is recomputed and the change is sealed.
-curl -s -X PATCH https://openplate.vercel.app/api/plates/<PLATE_ID> \
+curl -s -X PATCH https://openplate-sigma.vercel.app/api/plates/<PLATE_ID> \
   -H 'content-type: application/json' -b cookies.txt \
   -d '{"use":"merchandise","circulation":250000}' | jq '.assessment.band'
 
 # 5. Run the engine for a hypothetical, saving nothing.
-curl -s -X POST https://openplate.vercel.app/api/plates/<PLATE_ID>/assess \
+curl -s -X POST https://openplate-sigma.vercel.app/api/plates/<PLATE_ID>/assess \
   -H 'content-type: application/json' -b cookies.txt \
   -d '{"use":"broadcast"}' | jq '{band: .assessed.band, differs: .differsFromSaved}'
 
 # 6. Record a sealed decision.
-curl -s -X POST https://openplate.vercel.app/api/plates/<PLATE_ID>/decision \
+curl -s -X POST https://openplate-sigma.vercel.app/api/plates/<PLATE_ID>/decision \
   -H 'content-type: application/json' -b cookies.txt \
   -d '{"decision":"approved","note":"Term satisfied, credit line complete."}' | jq '.seal'
 
 # 7. Replay the chain.
-curl -s -b cookies.txt https://openplate.vercel.app/api/plates/<PLATE_ID>/verify \
+curl -s -b cookies.txt https://openplate-sigma.vercel.app/api/plates/<PLATE_ID>/verify \
   | jq '.verification | {ok, eventCount, brokenAtSeq}'
 
 # 8. Download the docket.
-curl -s 'https://openplate.vercel.app/api/docket/<SHARE_CODE>?format=md'
+curl -s 'https://openplate-sigma.vercel.app/api/docket/<SHARE_CODE>?format=md'
 
 # 9. Retire it. It is a tombstone: gone from reads, retained for verification.
-curl -s -X DELETE -b cookies.txt https://openplate.vercel.app/api/plates/<PLATE_ID> | jq '{retired, note}'
+curl -s -X DELETE -b cookies.txt https://openplate-sigma.vercel.app/api/plates/<PLATE_ID> | jq '{retired, note}'
 ```
 
 | Route | Methods | Purpose |
@@ -170,8 +171,8 @@ curl -s -X DELETE -b cookies.txt https://openplate.vercel.app/api/plates/<PLATE_
 
 ## 🤖 Agent tools
 
-The MCP endpoint is at **`https://openplate.vercel.app/api/mcp`**, and
-[`/mcp.json`](https://openplate.vercel.app/mcp.json) is generated at request time
+The MCP endpoint is at **`https://openplate-sigma.vercel.app/api/mcp`**, and
+[`/mcp.json`](https://openplate-sigma.vercel.app/mcp.json) is generated at request time
 with that host already filled in.
 
 ```json
@@ -179,7 +180,7 @@ with that host already filled in.
   "mcpServers": {
     "openplate": {
       "type": "http",
-      "url": "https://openplate.vercel.app/api/mcp",
+      "url": "https://openplate-sigma.vercel.app/api/mcp",
       "transport": "streamable-http"
     }
   }
@@ -196,7 +197,7 @@ with that host already filled in.
 | `retire_plate` | **mutating** | Retires a plate, retaining the tombstone and its chain. |
 
 ```bash
-curl -s https://openplate.vercel.app/api/mcp -H 'content-type: application/json' -d '{
+curl -s https://openplate-sigma.vercel.app/api/mcp -H 'content-type: application/json' -d '{
   "jsonrpc":"2.0","id":1,"method":"tools/call",
   "params":{"name":"assess_work","arguments":{
     "workId":"met:19275","use":"merchandise","jurisdiction":"us","circulation":50000}}}'
@@ -422,11 +423,11 @@ Full detail, including what the chain does *not* prove, is in
 npm run typecheck && npm run lint && npm run test && npm run build && npm run smoke
 ```
 
-- **50 tests.** The engine's normal, boundary, empty, malformed and
+- **70 tests.** The engine's normal, boundary, empty, malformed and
   deterministic-repeat cases; the chain's known vector plus tamper, splice and
-  orphan detection; and a full CRUD run against a real database through the real
-  service layer, including idempotent replay, ownership isolation, constraint
-  enforcement and the tombstone.
+  orphan detection; validation's empty-versus-malformed cases; and a full CRUD run
+  against a real database through the real service layer, including idempotent
+  replay, ownership isolation, constraint enforcement and the tombstone.
 - **The browser journey** files, inspects, re-runs the engine, decides, verifies,
   uses an agent tool, exports and retires — then asserts zero console errors and
   zero failed same-origin requests, checks focus visibility, and checks that
@@ -443,8 +444,8 @@ flowchart LR
   classDef infra fill:#94a3b8,stroke:#475569,color:#0f172a
   classDef agent fill:#22d3ee,stroke:#0e7490,color:#083344
 
-  V[typecheck]:::ok --> L[lint]:::ok --> T[50 tests]:::ok --> B[build]:::ok --> S[smoke]:::ok
-  B --> VL[verify:live<br/>21 checks against production]:::agent
+  V[typecheck]:::ok --> L[lint]:::ok --> T[70 tests]:::ok --> B[build]:::ok --> S[smoke]:::ok
+  B --> VL[verify:live<br/>22 checks against production]:::agent
   CI[Node 22, npm ci,<br/>no secrets required]:::infra --> V
 ```
 

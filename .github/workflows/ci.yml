@@ -72,6 +72,13 @@ jobs:
       - name: Browser smoke test
         run: npm run smoke
 
+      - name: Check that every README link still resolves
+        # A dead link in the README is a dead link in a visitor's face. Rate-limited
+        # hosts are reported but do not fail the build, because a 429 means the
+        # resource exists and the host is throttling this runner.
+        run: npm run check:links
+        continue-on-error: true
+
       - name: Upload failure trace
         if: failure()
         uses: actions/upload-artifact@v4

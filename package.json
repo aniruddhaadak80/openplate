@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "verify:live": "node scripts/verify-live.mjs",
-    "smoke": "playwright test"
+    "smoke": "playwright test",
+    "check:links": "node scripts/check-readme-links.mjs",
+    "verify:local": "node scripts/verify-local.mjs"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.8",
