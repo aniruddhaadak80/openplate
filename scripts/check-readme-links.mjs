@@ -21,6 +21,7 @@ const urls = [
 
 const skipped = [];
 const throttled = [];
+const unavailable = [];
 const failures = [];
 let checked = 0;
 
@@ -42,6 +43,11 @@ for (const url of urls) {
     // not the same as a dead link: the resource resolved and answered.
     if (status === 429 || status === 503) {
       throttled.push(`${status} ${url}`);
+    } else if (status === 402) {
+      // The deployment host is refusing to serve at all, for example a Vercel
+      // team over its fair-use limit. The URL resolves; the platform is
+      // blocked, so report it without treating the README as broken.
+      unavailable.push(`${status} ${url}`);
     } else if (status >= 400) {
       failures.push(`${status} ${url}`);
     } else {
@@ -58,10 +64,11 @@ for (const url of urls) {
 }
 
 console.log(
-  `\n${checked} checked, ${failures.length} broken, ${throttled.length} rate-limited, ${skipped.length} placeholders skipped`,
+  `\n${checked} checked, ${failures.length} broken, ${throttled.length} rate-limited, ${unavailable.length} unavailable, ${skipped.length} placeholders skipped`,
 );
 for (const failure of failures) console.log(`  FAIL ${failure}`);
 for (const url of throttled) console.log(`  throttled (resolves, host is limiting): ${url}`);
+for (const url of unavailable) console.log(`  unavailable (host blocked, not a broken link): ${url}`);
 for (const url of skipped) console.log(`  placeholder ${url}`);
 
 if (failures.length > 0) process.exit(1);
